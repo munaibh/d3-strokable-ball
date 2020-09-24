@@ -79,8 +79,6 @@ var proj = d3.geoOrthographic()
 
 
 var path = d3.geoPath().projection(proj).pointRadius(1.5);
-
-var graticule = d3.geoGraticule();
   
 var london = [-0.118667702475932, 51.5019405883275];
   
@@ -122,23 +120,11 @@ function ready(error, world, places) {
         .attr("class", "land")
         .attr("d", path);
 
-    svg.append("path")
-        .datum(graticule)
-        .attr("class", "graticule noclicks")
-        .attr("d", path);
 
     svg.append("g").attr("class","points")
         .selectAll("text").data(places.features)
       .enter().append("path")
         .attr("class", "point")
-  
-  	// svg.append("g").attr("class","lines")
-    //     .selectAll(".lines").data(places.features)
-    //   .enter().append("path")
-    //     .attr("class", "lines")
-    // 		.attr("id", d => stripWhitespace(d.properties.name))
-    //     .attr("d", d => lineToLondon(d));
-
 
     svg.append("g").attr("class","labels")
         .selectAll("text").data(places.features)
@@ -157,18 +143,7 @@ function ready(error, world, places) {
 
     position_labels();
   
-  	// svg.append("g").attr("class", "info")
-    //   .append("text")
-    // 	.attr("class", "distance")
-    //   .attr("x", width / 20)
-    //   .attr("y", height * 0.9)
-    // 	.attr("text-anchor", "start")
-    // 	.style("font-size", "12px")
-    //   .text("Distance from London: Hover Over A Location");  
-  
   	refresh();
-  
-  	// spin();
 }
 
 
@@ -199,27 +174,12 @@ function position_labels() {
 function refresh() {
   svg.selectAll(".land").attr("d", path);
   svg.selectAll(".countries path").attr("d", path);
-  svg.selectAll(".graticule").attr("d", path);
   svg.selectAll(".point").attr("d", path);
-  // svg.selectAll(".lines").attr("d", (d) => { if (d) { return lineToLondon(d); }});
   position_labels();
 }
 
   
-var timer;
-  
-function spin() {
-  timer = d3.timer(function() {
-    var dt = Date.now() -time;
-    
-    proj.rotate([rotate[0] + velocity[0] * dt, rotate[1] + velocity[1] * dt]);
-    
-    refresh();
-  });
-}
-  
 function dragstarted() {
-  // timer.stop();
   v0 = versor.cartesian(proj.invert(d3.mouse(this)));
   r0 = proj.rotate();
   q0 = versor(r0);
