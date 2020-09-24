@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  
+.land {
+ 	fill: white;
+  opacity: .5;
+  stroke: #4f2291;
+  stroke-opacity: 1;
+}
+
+.countries path {
+  stroke: #4f2291;  
+  stroke-linejoin: round;
+  stroke-width:.5;
+  fill: #4f2291;
+  opacity: .1;
+  pointer-events:none;
+}
+
+svg {
+  margin: 0 auto;
+  display: block;
+}
+  
+.lines path {
+  fill: none;
+  stroke: #4f2291;
+  stroke-opacity: 0.3;
+  stroke-dasharray: 5,5; 
+}
+  
+circle {
+  stroke: #4f2291;
+}
+  
+.graticule {
+  fill: none;
+  stroke: #4f2291;
+  stroke-width:.5;
+  opacity:.2;
+}
+
+.labels {
+  font: 8px sans-serif;
+  fill: black;
+  opacity: 1;
+  cursor: pointer;
+}
+
+.noclicks {
+  pointer-events:none;
+}
+
+.point {
+  opacity:.6;
+}
+</style>
+
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/queue.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v0.min.js"></script>
+<script src="versor.js"></script>
+
+<h1 class="clickShow"></h1>
+
+<script>
+
+var width = 375,
+    height = 500;
+
+var proj = d3.geoOrthographic()
+    .scale(190)
+    .translate([width / 2, height / 2])
+// change this to 180 for transparent globe
+    .clipAngle(90);
+
+
+var path = d3.geoPath().projection(proj).pointRadius(1.5);
+
+var graticule = d3.geoGraticule();
+  
+var london = [-0.118667702475932, 51.5019405883275];
+  
+var time = Date.now();
+var rotate = [39.666666666666664, -30];
+var velocity = [.015, -0];
+  
+var lineToLondon = function(d) {
+  return path({"type": "LineString", "coordinates": [london, d.geometry.coordinates]});
+}
+
+function stripWhitespace(str) {
+  return str.replace(" ", "");
+}
+
+var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+
+svg.call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged));
+
+queue()
+    .defer(d3.json, "world-110m.json")
+    .defer(d3.json, "destinations.json")
+    .await(ready);
+
+function ready(error, world, places) {
+    svg.append("circle")
+        .attr("cx", width / 2)
+      	.attr("cy", height / 2)
+        .attr("r", proj.scale())
+        .attr("class", "noclicks")
+    		.attr("fill", "none");
+    
+    svg.append("path")
+        .datum(topojson.object(world, world.objects.land))
+        .attr("class", "land")
+        .attr("d", path);
+
+    svg.append("path")
+        .datum(graticule)
+        .attr("class", "graticule noclicks")
+        .attr("d", path);
+
+    svg.append("g").attr("class","points")
+        .selectAll("text").data(places.features)
+      .enter().append("path")
+        .attr("class", "point")
+  
+  	// svg.append("g").attr("class","lines")
+    //     .selectAll(".lines").data(places.features)
+    //   .enter().append("path")
+    //     .attr("class", "lines")
+    // 		.attr("id", d => stripWhitespace(d.properties.name))
+    //     .attr("d", d => lineToLondon(d));
+
+
+    svg.append("g").attr("class","labels")
+        .selectAll("text").data(places.features)
+      .enter().append("text")
+      .attr("class", "label")
+      .append("a")
+        .attr("href", d => d.properties.link)
+        .attr("target", '_blank')
+        .text(d => d.properties.name)
+  
+    svg.append("g").attr("class","countries")
+      .selectAll("path")
+        .data(topojson.object(world, world.objects.countries).geometries)
+      .enter().append("path")
+        .attr("d", path); 
+
+    position_labels();
+  
+  	// svg.append("g").attr("class", "info")
+    //   .append("text")
+    // 	.attr("class", "distance")
+    //   .attr("x", width / 20)
+    //   .attr("y", height * 0.9)
+    // 	.attr("text-anchor", "start")
+    // 	.style("font-size", "12px")
+    //   .text("Distance from London: Hover Over A Location");  
+  
+  	refresh();
+  
+  	// spin();
+}
+
+
+function position_labels() {
+  var centerPos = proj.invert([width/2,height/2]);
+
+  svg.selectAll(".label")
+    .attr("text-anchor", (d) => {
+      var x = proj(d.geometry.coordinates)[0];
+      return x < width/2-20 ? "end" :
+             x < width/2+20 ? "middle" :
+             "start"
+    })
+    .attr("transform", (d) => {
+      var loc = proj(d.geometry.coordinates),
+        x = loc[0],
+        y = loc[1];
+      var offset = x < width/2 ? -5 : 5;
+      return "translate(" + (x+offset) + "," + (y-2) + ")"
+    })
+    .style("display", (d) => {
+      var d = d3.geoDistance(d.geometry.coordinates, centerPos);
+      return (d > 1.57) ? 'none' : 'inline';
+    })
+    
+}
+
+function refresh() {
+  svg.selectAll(".land").attr("d", path);
+  svg.selectAll(".countries path").attr("d", path);
+  svg.selectAll(".graticule").attr("d", path);
+  svg.selectAll(".point").attr("d", path);
+  // svg.selectAll(".lines").attr("d", (d) => { if (d) { return lineToLondon(d); }});
+  position_labels();
+}
+
+  
+var timer;
+  
+function spin() {
+  timer = d3.timer(function() {
+    var dt = Date.now() -time;
+    
+    proj.rotate([rotate[0] + velocity[0] * dt, rotate[1] + velocity[1] * dt]);
+    
+    refresh();
+  });
+}
+  
+function dragstarted() {
+  // timer.stop();
+  v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+  r0 = proj.rotate();
+  q0 = versor(r0);
+}
+  
+function dragged() {
+  var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this))),
+      q1 = versor.multiply(q0, versor.delta(v0, v1)),
+      r1 = versor.rotation(q1);
+  proj.rotate(r1);
+  refresh();
+}
+
+</script>
+
+</body>
+</html>
