@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+      body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+
   .land {
     fill: white;
     opacity: 1;
@@ -62,19 +64,36 @@
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://d3js.org/queue.v1.min.js"></script>
   <script src="https://d3js.org/topojson.v0.min.js"></script>
-  <script src="versor.js"></script>
+  <!-- <script src="versor.js"></script> -->
 
+  <svg></svg>
   <h1 class="clickShow"></h1>
 
-  <script>
-    var width = 375,
-      height = 500;
+
+<script>
+
+
+var svg = d3.select('svg'),
+        width = window.innerWidth,
+        height = window.innerHeight;
+    // var width = 375,
+    //   height = 500;
 
     var proj = d3.geoOrthographic()
-      .scale(190)
+    .fitSize([width, height])
+      .scale(width/3)
       .translate([width / 2, height / 2])
-      // change this to 180 for transparent globe
-      .clipAngle(90);
+      // // change this to 180 for transparent globe
+      // .clipAngle(90);
+
+
+        const initialScale = proj.scale()
+
+      svg.attr('width', width)
+      .attr('height', height)
+      .attr('class', 'globe')
+      	.attr('r', initialScale);
+
 
 
     var path = d3.geoPath().projection(proj)
@@ -96,13 +115,39 @@
     //   return str.replace(" ", "");
     // }
 
-    var svg = d3.select("body").append("svg")
-      .attr("width", width)
-      .attr("height", height)
+    // var svg = d3.select("body").append("svg")
+    //   .attr("width", width)
+    //   .attr("height", height)
+    const sensitivity = 75
 
-    svg.call(d3.drag()
-      .on("start", dragstarted)
-      .on("drag", dragged));
+    svg.call(d3.drag().on('drag', () => {
+    const rotate = proj.rotate()
+    const k = sensitivity / proj.scale()
+    proj.rotate([
+      rotate[0] + d3.event.dx * k,
+      rotate[1] - d3.event.dy * k
+    ])
+    path = d3.geoPath().projection(proj)
+    svg.selectAll("path").attr("d", path)
+    refresh();
+  }))
+    .call(d3.zoom().on('zoom', () => {
+    if(d3.event.transform.k > 0.3) {
+      proj.scale(initialScale * d3.event.transform.k)
+      path = d3.geoPath().projection(proj)
+      svg.selectAll("path").attr("d", path)
+      svg.selectAll(".noclicks").attr("r", proj.scale())
+      refresh();
+
+    }
+    else {
+      d3.event.transform.k = 0.3
+    }
+  }))
+
+    // svg.call(d3.drag()
+      // .on("start", dragstarted)
+      // .on("drag", dragged));
 
     queue()
       .defer(d3.json, "world-110m.json")
@@ -143,7 +188,7 @@
             .attr("cy", function (d) {
               return proj([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1];
             })
-            .attr("r", 15)
+            .attr("r", width/40)
             // .style("fill", "yellow")
         wow2.append("text")
         .attr("class", "link")
@@ -260,19 +305,19 @@
     }
 
 
-    function dragstarted() {
-      v0 = versor.cartesian(proj.invert(d3.mouse(this)));
-      r0 = proj.rotate();
-      q0 = versor(r0);
-    }
+    // function dragstarted() {
+    //   v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+    //   r0 = proj.rotate();
+    //   q0 = versor(r0);
+    // }
 
-    function dragged() {
-      var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this))),
-        q1 = versor.multiply(q0, versor.delta(v0, v1)),
-        r1 = versor.rotation(q1);
-      proj.rotate(r1);
-      refresh();
-    }
+    // function dragged() {
+    //   var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this))),
+    //     q1 = versor.multiply(q0, versor.delta(v0, v1)),
+    //     r1 = versor.rotation(q1);
+    //   proj.rotate(r1);
+    //   refresh();
+    // }
   </script>
 
 </body>
