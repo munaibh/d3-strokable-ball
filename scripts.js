@@ -21,6 +21,7 @@ svg.call(d3.zoom().on('zoom', onGlobeZoom))
 
 Promise.all(promises).then((values) =>{
   const [world, places] = values
+  resolveInitalCenter(places)
   drawGlobeToDom(world, places)
   drawDataToDom(world, places)
   resolvePathPositions()
@@ -70,6 +71,11 @@ function drawDataToDom(_world, places) {
   return svg
 }
 
+function resolveInitalCenter(places) {
+  if(!places || places.length <= 0) return projection.rotate([0, 0])
+  const [ longitude, latitude ] = places.features[0].coordinates
+  projection.rotate([longitude * -1, latitude * -1])
+}
 function resolvePathPositions() {
   const scaling = [width / 2, height / 2]
   const centerPosition = projection.invert(scaling)
