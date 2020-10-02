@@ -66,7 +66,7 @@ function drawDataToDom(_world, places) {
 
   anchor.append("text")
     .attr('class', `${baseClass}__text`)
-    .text(d => d.data.index)
+    .text(d => d.data.emoji)
 
   return svg
 }
