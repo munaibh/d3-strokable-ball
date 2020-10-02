@@ -65,7 +65,7 @@ function drawDataToDom(_world, places) {
 
   anchor.append("text")
     .attr('class', `${baseClass}__text`)
-    .text(d => d.properties.text)
+    .text(d => d.data.index)
 
   return svg
 }
@@ -75,20 +75,20 @@ function resolvePathPositions() {
   const centerPosition = projection.invert(scaling)
 
   svg.selectAll(`.${baseClass}__point`)
-    .attr("cx", ({ geometry: { coordinates } }) => projection(coordinates)[0])
-    .attr("cy", ({ geometry: { coordinates } }) => projection(coordinates)[1])
-    .style("display", ({ geometry: { coordinates } }) => {
+    .attr("cx", ({ coordinates }) => projection(coordinates)[0])
+    .attr("cy", ({ coordinates }) => projection(coordinates)[1])
+    .style("display", ({ coordinates }) => {
       var d = d3.geoDistance(coordinates, centerPosition)
       return (d > 1.57) ? 'none' : 'block'
     })
 
   svg.selectAll(`.${baseClass}__text`)
-    .attr("transform", function({ geometry: { coordinates } }) {
+    .attr("transform", function({ coordinates }) {
       const [ longitude, latitude ] = projection(coordinates)
       const linkWidth = this.clientWidth/2
       return `translate(${longitude - linkWidth}, ${(latitude + 5)})`
     })
-    .style("display", ({ geometry: { coordinates } }) => {
+    .style("display", ({ coordinates }) => {
       var d = d3.geoDistance(coordinates, centerPosition)
       return (d > 1.57) ? 'none' : 'block'
     })
@@ -112,7 +112,7 @@ function onGlobeZoom(event) {
   resolvePathPositions()
 }
 
-function handlePointClicked(_event, {properties}) {
+function handlePointClicked(_event, {data}) {
   d3.select(`.${baseClass}__data`)
-    .html(`<pre>${JSON.stringify(properties, undefined, 2)}</span>`)
+    .html(`<pre>${JSON.stringify(data, undefined, 2)}</span>`)
 }
