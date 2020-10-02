@@ -2,7 +2,7 @@ const baseClass = 'd3-globe'
 const svg = d3.select(`.${baseClass}__globe`)
 const container = document.querySelector(`.${baseClass}__svg`)
 
-const files = ['https://raw.githubusercontent.com/d3/d3.github.com/master/world-110m.v1.json', '/public/points.json']
+const files = ['https://raw.githubusercontent.com/d3/d3.github.com/master/world-110m.v1.json', 'public/points.json']
 const width = container.clientWidth, height = container.clientHeight
 const scale = width > height ? (height/2) : (width/2)
 const projection = d3.geoOrthographic()
