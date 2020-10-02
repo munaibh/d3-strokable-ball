@@ -1,6 +1,9 @@
-const svg = d3.select('.globe-container')
+const baseClass = 'd3-globe'
+const svg = d3.select(`.${baseClass}__globe`)
+const container = document.querySelector(`.${baseClass}__svg`)
+
 const files = ['https://raw.githubusercontent.com/d3/d3.github.com/master/world-110m.v1.json', 'destinations.json']
-const width = window.innerWidth, height = window.innerHeight
+const width = container.clientWidth, height = container.clientHeight
 const scale = width > height ? (height/2) : (width/2)
 const projection = d3.geoOrthographic()
   .fitSize([width, height])
@@ -21,25 +24,25 @@ Promise.all(promises).then((values) =>{
   drawGlobeToDom(world, places)
   drawDataToDom(world, places)
   resolvePathPositions()
+  container.dataset.visible = true
 })
 
 function drawGlobeToDom(world, places) {
   svg
     .attr('width', width)
     .attr('height', height)
-    .attr('class', 'globe')
-    .attr('r', initialScale)
+    .attr('r', projection.scale())
 
   svg.append("circle")
     .attr("cx", width / 2)
     .attr("cy", height / 2)
     .attr("r", projection.scale())
-    .attr("class", "globe__base")
+    .attr('class', `${baseClass}__base`)
     .attr("fill", "none")
 
   svg.append("path")
     .datum(topojson.object(world, world.objects.land))
-    .attr("class", "globe__land")
+    .attr('class', `${baseClass}__land`)
     .attr("d", path)
 
   return svg
@@ -47,31 +50,22 @@ function drawGlobeToDom(world, places) {
 
 function drawDataToDom(_world, places) {
   const points = svg.append("g")
-    .attr("class", "globe__points")
-    .selectAll("globe__points")
+    .attr('class', `${baseClass}__points`)
+    .selectAll(`.${baseClass}__points`)
     .data(places.features)
     .enter().append("g")
 
-  const anchor = points.append('a')
-    .attr("class", "globe__link")
-    .attr("href", d => d.properties.link)
-    .attr("target", '_blank')
+  const anchor = points.append('g')
+    .attr('class', `${baseClass}__group`)
     .on("click", handlePointClicked)
 
   anchor.append("circle")
-    .attr("class", "globe__point")
+    .attr('class', `${baseClass}__point`)
     .attr("r", 25)
 
   anchor.append("text")
-    .attr("class", "globe__text")
-    .attr("target", '_blank')
+    .attr('class', `${baseClass}__text`)
     .text(d => d.properties.text)
-
-  d3.select('.globe-use-links')
-    .on("click", function() {
-      window.useLinks = !window.useLinks
-      this.innerHTML = window.useLinks ? 'Disable Linking' : 'Enable Linking'
-    })
 
   return svg
 }
@@ -80,7 +74,7 @@ function resolvePathPositions() {
   const scaling = [width / 2, height / 2]
   const centerPosition = projection.invert(scaling)
 
-  svg.selectAll(".globe__point")
+  svg.selectAll(`.${baseClass}__point`)
     .attr("cx", ({ geometry: { coordinates } }) => projection(coordinates)[0])
     .attr("cy", ({ geometry: { coordinates } }) => projection(coordinates)[1])
     .style("display", ({ geometry: { coordinates } }) => {
@@ -88,7 +82,7 @@ function resolvePathPositions() {
       return (d > 1.57) ? 'none' : 'block'
     })
 
-  svg.selectAll(".globe__text")
+  svg.selectAll(`.${baseClass}__text`)
     .attr("transform", function({ geometry: { coordinates } }) {
       const [ longitude, latitude ] = projection(coordinates)
       const linkWidth = this.clientWidth/2
@@ -105,7 +99,7 @@ function handleGlobeDrag(event) {
   const rotate = projection.rotate()
   const k = sensitivity / projection.scale()
   projection.rotate([rotate[0] + event.dx * k, rotate[1] - event.dy * k])
-  svg.selectAll(".globe__land").attr("d", path)
+  svg.selectAll(`.${baseClass}__land`).attr("d", path)
   resolvePathPositions()
 }
 
@@ -113,13 +107,12 @@ function onGlobeZoom(event) {
   const isScaled = event.transform.k <= 0.3
   if(isScaled) return event.transform.k = 0.3
   projection.scale(initialScale * event.transform.k)
-  svg.selectAll(".globe__land").attr("d", path)
-  svg.selectAll(".globe__base").attr("r", projection.scale())
+  svg.selectAll(`.${baseClass}__land`).attr("d", path)
+  svg.selectAll(`.${baseClass}__base`).attr("r", projection.scale())
   resolvePathPositions()
 }
 
-function handlePointClicked(event, {properties}) {
-  if(!window.useLinks) event.preventDefault()
-  d3.select('.globe-properties')
+function handlePointClicked(_event, {properties}) {
+  d3.select(`.${baseClass}__data`)
     .html(`<pre>${JSON.stringify(properties, undefined, 2)}</span>`)
 }

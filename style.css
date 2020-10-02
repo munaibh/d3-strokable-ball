@@ -1,19 +1,11 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
-:root {
-  font-size: 16px;
-  --globe-base-colour: hotpink;
-  --globe-land-colour: yellowgreen;
-  --globe-point-background-colour: #800080c7;
-  --globe-point-text-colour: white;
-}
-
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
 }
@@ -24,42 +16,91 @@ body {
   line-height: 1;
 }
 
-.globe-use-links {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.globe-properties {
-  position: absolute;
-  bottom: 0;
-  font-size: 13px;
-  background: rgba(0, 0, 0, .2);
+.d3-globe {
   width: 100%;
-}
-
-.globe-properties pre {
+  height: 100%;
   padding: 20px;
-  white-space: pre-wrap;
+  overflow: hidden;
+  position: relative;
 }
 
-.globe__base {
-  fill: var(--globe-base-colour)
+.d3-globe__svg {
+  width: 100%;
+  height: 100%;
+  -webkit-transform: scale(0);
+          transform: scale(0);
+  -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  transition: -webkit-transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56), -webkit-transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
 }
 
-.globe__land {
-  fill: var(--globe-land-colour)
+.d3-globe__svg[data-visible="true"] {
+  -webkit-transform: scale(1);
+          transform: scale(1);
 }
 
-.globe__point {
-  fill: var(--globe-point-background-colour)
+.d3-globe__globe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
 }
 
-.globe__text {
-  fill: var(--globe-point-text-colour);
+.d3-globe__base {
+  fill: var(--globe-base-colour, #0480b1);
+}
+
+.d3-globe__land {
+  fill: var(--globe-land-colour, #8eab2e);
+  stroke: var(--globe-lands-troke-colour, transparent);
+}
+
+.d3-globe__point {
+  fill: var(--globe-point-background-colour, #4b4a74de);
+  stroke: var(--globe-point-stroke-colour, transparent);
+}
+
+.d3-globe__text {
+  fill: var(--globe-point-text-colour, white);
   pointer-events: none;
 }
 
-.globe__link:hover {
-  --globe-point-background-colour: black;
+.d3-globe__group {
+  cursor: pointer;
 }
+
+.d3-globe__group:hover {
+  --globe-point-stroke-colour: var(--globe-point-hover-stroke-colour, transparent);
+  --globe-point-background-colour: var(--globe-point-hover-background-colour, black);
+  --globe-point-text-colour: var(--globe-point-hover-text-colour, white);
+}
+
+.d3-globe__data {
+  position: absolute;
+  bottom: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  left: 10px;
+  right: 10px;
+  text-align: center;
+  font-size: 12px;
+  padding: 20px;
+  border-radius: 5px;
+  color: black;
+  -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  transition: -webkit-transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56), -webkit-transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.56);
+  -webkit-transform: translateY(0);
+          transform: translateY(0);
+}
+
+.d3-globe__data:empty {
+  -webkit-transform: translateY(calc(100% + 20px));
+          transform: translateY(calc(100% + 20px));
+}
+
+.d3-globe__data pre {
+  white-space: inherit;
+}
+/*# sourceMappingURL=style.css.map */

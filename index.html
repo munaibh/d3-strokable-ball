@@ -7,9 +7,14 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body> 
-  <svg class="globe-container"></svg>
-  <h1 class="globe-properties"></h1>
-  <button class="globe-use-links">Enable Linking</button>
+
+  <div class="d3-globe">
+    <div class="d3-globe__svg">
+      <svg class="d3-globe__globe"></svg>
+    </div>
+    <div class="d3-globe__data"></div>
+  </div>
+
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://d3js.org/topojson.v0.min.js"></script>
   <script src="scripts.js"></script>
