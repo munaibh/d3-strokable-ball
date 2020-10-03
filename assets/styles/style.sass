@@ -29,10 +29,11 @@ body
     &[data-visible="true"]
       transform: scale(1)
 
-  &__globe 
+  &__globe, &__shadow
     position: absolute
-    top: 0
-    left: 0
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
     overflow: visible
   
   &__base 
@@ -48,6 +49,12 @@ body
 
   &__text
     fill: var(--globe-point-text-colour, white)
+    pointer-events: none
+
+  &__shadow
+    box-shadow: inset -25px -25px 40px rgba(0,0,0,.35)
+    z-index: 1
+    border-radius: 50%
     pointer-events: none
 
   &__group

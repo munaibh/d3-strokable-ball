@@ -25,6 +25,7 @@ Promise.all(promises).then((values) =>{
   drawGlobeToDom(world, places)
   drawDataToDom(world, places)
   resolvePathPositions()
+  applyShadow()
   container.dataset.visible = true
 })
 
@@ -69,6 +70,13 @@ function drawDataToDom(_world, places) {
     .text(d => d.data.emoji)
 
   return svg
+}
+
+function applyShadow() {
+  const base = d3.select(`.${baseClass}__base`).node().getBBox()
+  d3.selectAll(`.${baseClass}__shadow`)
+    .style('width', `${base.width}px`)
+    .style('height', `${base.height}px`)
 }
 
 function resolveInitalCenter(places) {
@@ -116,6 +124,7 @@ function onGlobeZoom(event) {
   svg.selectAll(`.${baseClass}__land`).attr("d", path)
   svg.selectAll(`.${baseClass}__base`).attr("r", projection.scale())
   resolvePathPositions()
+  applyShadow()
 }
 
 function handlePointClicked(_event, {data}) {
