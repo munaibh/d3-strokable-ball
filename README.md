@@ -1,12 +1,11 @@
 <p align="center">
   <span style="font-size: 80px">🌍</span>
-  <h1 align="center">D3 Draggable Globe</h1>
+  <h1 align="center">D3 Strokable Ball</h1>
 </p>
 
 <p align="center">
   <b>A D3 draggable globe, which allows plotting of points via a json endppoint. Also, allows data to be associated and rendered which each point.</b><br>
-  <sub>
-    Demo: <a href="https://munaibh.github.io/d3-destination-globe-drag/">https://munaibh.github.io/d3-destination-globe-drag</a> 
+  <sub>(Demo: <a href="https://munaibh.github.io/d3-strokable-ball//">https://munaibh.github.io/d3-strokable-ball/</a>)
   </sub>
 </p>
 
