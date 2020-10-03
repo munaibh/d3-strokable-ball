@@ -55,7 +55,7 @@ body {
 
 .d3-globe__land {
   fill: var(--globe-land-colour, #8eab2e);
-  stroke: var(--globe-lands-troke-colour, transparent);
+  stroke: var(--globe-land-stroke-colour, transparent);
 }
 
 .d3-globe__point {
