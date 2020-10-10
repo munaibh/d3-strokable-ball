@@ -70,9 +70,20 @@ function drawDataToDom(_world, places) {
 
   anchor.append("text")
     .attr('class', `${baseClass}__text`)
+    .style("font-size", "1px")
     .text(d => d.data.emoji)
+    .each(getTextSize)
+    .style("font-size", function(d) { return d.scale/2 + "px"; });
+    
 
   return svg
+}
+
+function getTextSize(d) {
+  var bbox = this.getBBox(),
+      cbbox = this.parentNode.getBBox(),
+      scale = Math.min(cbbox.width/bbox.width, cbbox.height/bbox.height);
+  d.scale = scale;
 }
 
 function applyShadow() {
@@ -102,8 +113,9 @@ function resolvePathPositions() {
   svg.selectAll(`.${baseClass}__text`)
     .attr("transform", function({ coordinates }) {
       const [ longitude, latitude ] = projection(coordinates)
-      const linkWidth = this.clientWidth/2
-      return `translate(${longitude - linkWidth}, ${(latitude + 5)})`
+      const linkWidth = this.getBBox().width/2
+      const linkHeight = this.getBBox().height/4
+      return `translate(${longitude - linkWidth}, ${(latitude + linkHeight)})`
     })
     .style("display", ({ coordinates }) => {
       var d = d3.geoDistance(coordinates, centerPosition)
@@ -158,6 +170,11 @@ window.onresize = () => {
     svg.selectAll(`.${baseClass}__land`)
     .attr("d", path)
 
+  svg.selectAll(`.${baseClass}__text`)
+    .style("font-size", "1px")
+    .each(getTextSize)
+    .style("font-size", function(d) { return d.scale/2 + "px"; });
+    
   resolvePathPositions()
   applyShadow()
 }
