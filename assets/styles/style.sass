@@ -47,6 +47,11 @@ body
     fill: var(--globe-point-background-colour, #4b4a74de)
     stroke: var(--globe-point-stroke-colour, transparent)
 
+    &:hover
+      --globe-point-stroke-colour: var(--globe-point-hover-stroke-colour, transparent)
+      --globe-point-background-colour: var(--globe-point-hover-background-colour, black)
+      --globe-point-text-colour: var(--globe-point-hover-text-colour, white)
+
   &__text
     fill: var(--globe-point-text-colour, white)
     pointer-events: none
@@ -59,10 +64,6 @@ body
 
   &__group
     cursor: pointer
-    &:hover
-      --globe-point-stroke-colour: var(--globe-point-hover-stroke-colour, transparent)
-      --globe-point-background-colour: var(--globe-point-hover-background-colour, black)
-      --globe-point-text-colour: var(--globe-point-hover-text-colour, white)
 
 .d3-globe
   &__data

@@ -63,6 +63,12 @@ body {
   stroke: var(--globe-point-stroke-colour, transparent);
 }
 
+.d3-globe__point:hover {
+  --globe-point-stroke-colour: var(--globe-point-hover-stroke-colour, transparent);
+  --globe-point-background-colour: var(--globe-point-hover-background-colour, black);
+  --globe-point-text-colour: var(--globe-point-hover-text-colour, white);
+}
+
 .d3-globe__text {
   fill: var(--globe-point-text-colour, white);
   pointer-events: none;
@@ -78,12 +84,6 @@ body {
 
 .d3-globe__group {
   cursor: pointer;
-}
-
-.d3-globe__group:hover {
-  --globe-point-stroke-colour: var(--globe-point-hover-stroke-colour, transparent);
-  --globe-point-background-colour: var(--globe-point-hover-background-colour, black);
-  --globe-point-text-colour: var(--globe-point-hover-text-colour, white);
 }
 
 .d3-globe__data {

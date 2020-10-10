@@ -58,23 +58,22 @@ function drawDataToDom(_world, places) {
     .attr('class', `${baseClass}__points`)
     .selectAll(`.${baseClass}__points`)
     .data(places.features)
-    .enter().append("g")
-
-  const anchor = points.append('g')
+    .enter()
+    .append("g")
     .attr('class', `${baseClass}__group`)
     .on("click", handlePointClicked)
 
-  anchor.append("circle")
+  points.append("circle")
     .attr('class', `${baseClass}__point`)
     .attr("r", 25)
 
-  anchor.append("text")
+  points.append("text")
     .attr('class', `${baseClass}__text`)
+    .style('pointer-events', 'none')
     .style("font-size", "1px")
     .text(d => d.data.emoji)
     .each(getTextSize)
-    .style("font-size", function(d) { return d.scale/2 + "px"; });
-    
+    .style("font-size", function(d) { return d.scale/2 + "px"; })    
 
   return svg
 }
@@ -173,7 +172,7 @@ window.onresize = () => {
   svg.selectAll(`.${baseClass}__text`)
     .style("font-size", "1px")
     .each(getTextSize)
-    .style("font-size", function(d) { return d.scale/2 + "px"; });
+    .style("font-size", function(d) { return d.scale/2 + "px"; })
     
   resolvePathPositions()
   applyShadow()
