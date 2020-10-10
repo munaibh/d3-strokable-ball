@@ -1,10 +1,11 @@
 const baseClass = 'd3-globe'
 const svg = d3.select(`.${baseClass}__globe`)
 const container = document.querySelector(`.${baseClass}__svg`)
-
 const files = ['https://raw.githubusercontent.com/d3/d3.github.com/master/world-110m.v1.json', 'public/points.json']
-const width = container.clientWidth, height = container.clientHeight
-const scale = width > height ? (height/2) : (width/2)
+
+let width = container.clientWidth, height = container.clientHeight
+let scale = width > height ? (height/2) : (width/2)
+
 const projection = d3.geoOrthographic()
   .fitSize([width, height])
   .scale(scale)
@@ -21,6 +22,8 @@ svg.call(d3.zoom().on('zoom', onGlobeZoom))
 
 Promise.all(promises).then((values) =>{
   const [world, places] = values
+  window.world = world
+  window.places = places
   resolveInitalCenter(places)
   drawGlobeToDom(world, places)
   drawDataToDom(world, places)
@@ -130,4 +133,31 @@ function onGlobeZoom(event) {
 function handlePointClicked(_event, {data}) {
   d3.select(`.${baseClass}__data`)
     .html(`<pre>${JSON.stringify(data, undefined, 2)}</span>`)
+}
+
+
+window.onresize = () => {
+  width = container.clientWidth, height = container.clientHeight
+  scale = width > height ? (height/2) : (width/2)
+  
+  projection
+    .fitSize([width, height])
+    .scale(scale)
+    .translate([width / 2, height / 2])
+
+  svg
+    .attr('width', width)
+    .attr('height', height)
+    .attr('r', projection.scale())
+
+  svg.selectAll(`.${baseClass}__base`)
+    .attr("cx", width / 2)
+    .attr("cy", height / 2)
+    .attr("r", projection.scale())
+
+    svg.selectAll(`.${baseClass}__land`)
+    .attr("d", path)
+
+  resolvePathPositions()
+  applyShadow()
 }
