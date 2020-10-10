@@ -105,9 +105,9 @@ function resolvePathPositions() {
   svg.selectAll(`.${baseClass}__point`)
     .attr("cx", ({ coordinates }) => projection(coordinates)[0])
     .attr("cy", ({ coordinates }) => projection(coordinates)[1])
-    .style("display", ({ coordinates }) => {
+    .style("opacity", ({ coordinates }) => {
       var d = d3.geoDistance(coordinates, centerPosition)
-      return (d > 1.57) ? 'none' : 'block'
+      return (d > 1.57) ? '0' : '1'
     })
 
   svg.selectAll(`.${baseClass}__text`)
@@ -117,9 +117,9 @@ function resolvePathPositions() {
       const linkHeight = this.getBBox().height/4
       return `translate(${longitude - linkWidth}, ${(latitude + linkHeight)})`
     })
-    .style("display", ({ coordinates }) => {
+    .style("opacity", ({ coordinates }) => {
       var d = d3.geoDistance(coordinates, centerPosition)
-      return (d > 1.57) ? 'none' : 'block'
+      return (d > 1.57) ? '0' : '1'
     })
 }
 
